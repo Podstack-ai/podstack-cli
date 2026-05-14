@@ -32,6 +32,7 @@ var versionCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(newSendCmd())
+	rootCmd.AddCommand(newReceiveCmd())
 }
 
 func Execute() error {
