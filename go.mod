@@ -1,6 +1,6 @@
 module github.com/Podstack-ai/podstack-cli
 
-go 1.25.7
+go 1.25.0
 
 require (
 	github.com/schollz/croc/v10 v10.4.3
