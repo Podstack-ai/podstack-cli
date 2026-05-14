@@ -75,6 +75,15 @@ If a transfer is interrupted, re-run the same `podstack receive` command in
 the same output directory. The partial file is detected by hash and the
 transfer resumes where it left off.
 
+### Parallel transfers
+
+Each transfer is split across multiple TCP streams (4 by default). On
+high-bandwidth links, bump it:
+
+```sh
+podstack send --transfers 8 ./huge-dataset.tar
+```
+
 ## License
 
 MIT — see [LICENSE](./LICENSE).

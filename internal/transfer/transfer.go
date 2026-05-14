@@ -19,11 +19,11 @@ import (
 
 const minCodeLen = 6
 
-// basePort and transferCount mirror croc's CLI defaults. The relay must
-// expose basePort..basePort+transferCount.
+// basePort and DefaultTransfers mirror the underlying engine's defaults.
+// The relay must expose basePort..basePort+Transfers.
 const (
-	basePort      = 9009
-	transferCount = 4
+	basePort         = 9009
+	DefaultTransfers = 4
 )
 
 // SendConfig is the user-facing send configuration.
@@ -34,6 +34,7 @@ type SendConfig struct {
 	Text       string   // text body (mutually exclusive with Paths)
 	ZipFolder  bool
 	NoCompress bool
+	Transfers  int // parallel TCP streams; 0 falls back to DefaultTransfers
 }
 
 // ReceiveConfig is the user-facing receive configuration.
@@ -74,9 +75,12 @@ func (c ReceiveConfig) Validate() error {
 	return nil
 }
 
-func buildRelayPorts() []string {
-	ports := make([]string, transferCount+1)
-	for i := 0; i <= transferCount; i++ {
+func buildRelayPorts(transfers int) []string {
+	if transfers <= 0 {
+		transfers = DefaultTransfers
+	}
+	ports := make([]string, transfers+1)
+	for i := 0; i <= transfers; i++ {
 		ports[i] = strconv.Itoa(basePort + i)
 	}
 	return ports
@@ -88,7 +92,7 @@ func buildSendOptions(cfg SendConfig) croc.Options {
 		SharedSecret:  cfg.Code,
 		RelayAddress:  cfg.Relay,
 		RelayAddress6: "", // forced empty: we use a single IPv4 relay
-		RelayPorts:    buildRelayPorts(),
+		RelayPorts:    buildRelayPorts(cfg.Transfers),
 		RelayPassword: models.DEFAULT_PASSPHRASE,
 		Curve:         "p256",
 		HashAlgorithm: "xxhash",
@@ -114,11 +118,13 @@ func buildReceiveOptions(cfg ReceiveConfig) croc.Options {
 	}
 }
 
-// Send performs the send half of the croc handshake.
+// Send performs the send half of the transfer handshake.
 func Send(cfg SendConfig) error {
 	if err := cfg.Validate(); err != nil {
 		return err
 	}
+	restore := suppressStderr()
+	defer restore()
 	opts := buildSendOptions(cfg)
 
 	var (
@@ -149,11 +155,13 @@ func Send(cfg SendConfig) error {
 	return nil
 }
 
-// Receive performs the receive half of the croc handshake.
+// Receive performs the receive half of the transfer handshake.
 func Receive(cfg ReceiveConfig) error {
 	if err := cfg.Validate(); err != nil {
 		return err
 	}
+	restore := suppressStderr()
+	defer restore()
 	if cfg.OutDir != "" {
 		if err := os.MkdirAll(cfg.OutDir, 0o755); err != nil {
 			return fmt.Errorf("creating out dir: %w", err)

@@ -7,14 +7,12 @@ import (
 
 const (
 	// PodstackDefault is the relay used when no flag, env, or override is set.
-	// Set to croc's public relay; operators running their own relay should
-	// override at runtime via --relay or PODSTACK_RELAY.
-	PodstackDefault = "croc.schollz.com:9009"
-	// CrocPublicDefault is the same as PodstackDefault. It exists so the
-	// --relay-default flag keeps a stable identity even though it now
-	// resolves to the same address as the built-in default.
+	// Points at the Podstack-operated relay.
+	PodstackDefault = "relay.cloud.podstack.ai:9009"
+	// CrocPublicDefault is the fallback used by --relay-default for operators
+	// who want the upstream public relay instead of the Podstack one.
 	CrocPublicDefault = "croc.schollz.com:9009"
-	// defaultPort is the canonical croc relay port.
+	// defaultPort is the canonical relay port.
 	defaultPort = "9009"
 )
 

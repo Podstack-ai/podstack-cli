@@ -1,0 +1,108 @@
+package transfer
+
+import (
+	"bytes"
+	"io"
+	"os"
+	"regexp"
+	"sync"
+)
+
+// suppressPatterns are regexes matched against complete \n-terminated lines
+// written to stderr by the underlying transfer engine. Matching lines are
+// dropped before the user sees them. The patterns target instructional
+// output that names the underlying engine or leaks its CLI invocations;
+// the user-visible CLI is podstack.
+var suppressPatterns = []*regexp.Regexp{
+	regexp.MustCompile(`^Code is: `),
+	regexp.MustCompile(`^On the other computer run:`),
+	regexp.MustCompile(`^\(For Windows\)`),
+	regexp.MustCompile(`^\(For Linux/macOS\)`),
+	regexp.MustCompile(`^\s+croc `),
+	regexp.MustCompile(`CROC_SECRET=`),
+	regexp.MustCompile(`Code copied to clipboard`),
+}
+
+// suppressStderr installs a line filter over os.Stderr. While installed,
+// any complete line written to stderr is matched against suppressPatterns
+// and dropped if it matches; otherwise it passes through unchanged.
+// Partial lines (e.g. progress-bar \r updates) flow through immediately.
+//
+// Returns a restore function the caller must invoke (typically via defer)
+// before returning. Restore closes the pipe, drains the goroutine, and
+// puts os.Stderr back to the original FD.
+func suppressStderr() func() {
+	orig := os.Stderr
+	r, w, err := os.Pipe()
+	if err != nil {
+		return func() {}
+	}
+	os.Stderr = w
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		filterStream(r, orig)
+	}()
+
+	return func() {
+		_ = w.Close()
+		wg.Wait()
+		os.Stderr = orig
+	}
+}
+
+// filterStream copies from r to dst, dropping lines that match
+// suppressPatterns. \r-terminated chunks (progress bars) are passed
+// through immediately so the terminal can repaint them in place.
+func filterStream(r io.Reader, dst io.Writer) {
+	var buf bytes.Buffer
+	chunk := make([]byte, 4096)
+	for {
+		n, err := r.Read(chunk)
+		if n > 0 {
+			buf.Write(chunk[:n])
+			drainBuffer(&buf, dst)
+		}
+		if err != nil {
+			if buf.Len() > 0 {
+				_, _ = dst.Write(buf.Bytes())
+			}
+			return
+		}
+	}
+}
+
+func drainBuffer(buf *bytes.Buffer, dst io.Writer) {
+	for {
+		data := buf.Bytes()
+		if len(data) == 0 {
+			return
+		}
+		nl := bytes.IndexByte(data, '\n')
+		if nl < 0 {
+			cr := bytes.IndexByte(data, '\r')
+			if cr < 0 {
+				return // wait for more data
+			}
+			_, _ = dst.Write(data[:cr+1])
+			buf.Next(cr + 1)
+			continue
+		}
+		line := data[:nl+1]
+		if !shouldSuppress(line) {
+			_, _ = dst.Write(line)
+		}
+		buf.Next(nl + 1)
+	}
+}
+
+func shouldSuppress(line []byte) bool {
+	for _, re := range suppressPatterns {
+		if re.Match(line) {
+			return true
+		}
+	}
+	return false
+}

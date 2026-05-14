@@ -29,11 +29,10 @@ Examples:
   podstack receive my-shared-code
   podstack receive my-shared-code --out ./downloads
   podstack receive --yes my-shared-code
-  podstack receive --relay-default my-shared-code
 
 Resume: if an earlier receive was interrupted, re-run the same command
-in the same output directory and croc will resume the partial file
-based on its hash.`,
+in the same output directory. The partial file is detected by hash and
+the transfer resumes from where it left off.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			relayAddr, err := relay.Resolve(flags.relay, flags.relayDefault, strings.TrimSpace(os.Getenv("PODSTACK_RELAY")))
@@ -49,7 +48,8 @@ based on its hash.`,
 				AutoAccept: flags.yes,
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Relay: %s\nCode:  %s\n\n", relayAddr, code)
+			PrintBanner(cmd.OutOrStdout())
+			fmt.Fprintf(cmd.OutOrStdout(), "Relay:  %s\nCode:   %s\n\n", relayAddr, code)
 
 			return transfer.Receive(cfg)
 		},
@@ -57,7 +57,7 @@ based on its hash.`,
 
 	cmd.Flags().StringVar(&flags.out, "out", "", "output directory (default: cwd)")
 	cmd.Flags().StringVar(&flags.relay, "relay", "", "relay host[:port] (overrides default)")
-	cmd.Flags().BoolVar(&flags.relayDefault, "relay-default", false, "use croc's public relay (croc.schollz.com)")
+	cmd.Flags().BoolVar(&flags.relayDefault, "relay-default", false, "use the upstream public relay instead of the Podstack one")
 	cmd.Flags().BoolVar(&flags.yes, "yes", false, "auto-accept the incoming transfer")
 
 	return cmd
