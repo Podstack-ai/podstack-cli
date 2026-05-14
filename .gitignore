@@ -1,0 +1,18 @@
+# Binaries
+podstack
+podstack-*
+*.exe
+
+# Go
+*.test
+*.out
+vendor/
+
+# Goreleaser
+dist/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
