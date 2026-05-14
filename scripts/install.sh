@@ -85,10 +85,10 @@ if [ -z "$INSTALL_DIR" ]; then
     INSTALL_DIR="/usr/local/bin"
   else
     INSTALL_DIR="${HOME}/.local/bin"
-    mkdir -p "$INSTALL_DIR"
     note "Installing to ${INSTALL_DIR} (not on /usr/local/bin — add it to PATH if needed)"
   fi
 fi
+mkdir -p "$INSTALL_DIR" || err "could not create install dir: ${INSTALL_DIR}"
 
 mv "${TMP}/podstack" "${INSTALL_DIR}/podstack"
 note "Installed: ${INSTALL_DIR}/podstack"
