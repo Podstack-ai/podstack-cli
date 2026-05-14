@@ -74,7 +74,9 @@ podstack --help
 3. `PODSTACK_RELAY` environment variable
 4. Built-in default: `relay.cloud.podstack.ai`
 
-`--relay` and `--relay-default` are mutually exclusive; passing both is an error.
+`--relay` and `--relay-default` are mutually exclusive; passing both is an
+error. `--text` is mutually exclusive with positional file/directory arguments;
+passing both is an error.
 
 ### Resume
 
