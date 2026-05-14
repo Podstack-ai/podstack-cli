@@ -13,7 +13,7 @@ var rootCmd = &cobra.Command{
 	Short: "Send and receive large files using croc",
 	Long: `podstack is a thin wrapper around croc (https://github.com/schollz/croc).
 
-It defaults to the Podstack relay (relay.cloud.podstack.ai) and supports
+It defaults to croc's public relay (croc.schollz.com) and supports
 sending files, directories, and text. Interrupted transfers resume
 automatically when the receiver is re-run with the same code in the same
 output directory.`,
