@@ -16,18 +16,12 @@ Supports macOS and Linux (`amd64` and `arm64`).
 ### One-liner
 
 ```sh
-curl -fsSL https://podstack.ai/install.sh | sh
-```
-
-### Homebrew
-
-```sh
-brew install podstack/tap/podstack
+curl -fsSL https://github.com/Podstack-ai/podstack-cli/releases/latest/download/install.sh | sh
 ```
 
 ### Binary download
 
-Download a release tarball from <https://github.com/podstack/podstack-cli/releases>
+Download a release tarball from <https://github.com/Podstack-ai/podstack-cli/releases>
 and place `podstack` on your `PATH`.
 
 ## Usage

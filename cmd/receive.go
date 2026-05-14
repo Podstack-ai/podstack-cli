@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/podstack/podstack-cli/internal/relay"
-	"github.com/podstack/podstack-cli/internal/transfer"
+	"github.com/Podstack-ai/podstack-cli/internal/relay"
+	"github.com/Podstack-ai/podstack-cli/internal/transfer"
 	"github.com/spf13/cobra"
 )
 

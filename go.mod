@@ -1,4 +1,4 @@
-module github.com/podstack/podstack-cli
+module github.com/Podstack-ai/podstack-cli
 
 go 1.25.7
 
