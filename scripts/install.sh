@@ -12,7 +12,7 @@
 
 set -eu
 
-REPO="podstack/podstack-cli"
+REPO="Podstack-ai/podstack-cli"
 GH_API="https://api.github.com/repos/${REPO}"
 GH_DL="https://github.com/${REPO}/releases/download"
 

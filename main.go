@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/podstack/podstack-cli/cmd"
-	"github.com/podstack/podstack-cli/internal/relay"
+	"github.com/Podstack-ai/podstack-cli/cmd"
+	"github.com/Podstack-ai/podstack-cli/internal/relay"
 )
 
 func main() {

@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/podstack/podstack-cli/internal/transfer"
+	"github.com/Podstack-ai/podstack-cli/internal/transfer"
 	"github.com/schollz/croc/v10/src/models"
 	"github.com/schollz/croc/v10/src/tcp"
 )
