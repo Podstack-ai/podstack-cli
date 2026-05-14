@@ -2,13 +2,14 @@ module github.com/podstack/podstack-cli
 
 go 1.25.7
 
-require github.com/spf13/cobra v1.8.1
+require (
+	github.com/schollz/croc/v10 v10.4.3
+	github.com/spf13/cobra v1.8.1
+)
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/chzyer/readline v1.5.1 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kalafut/imohash v1.1.1 // indirect
@@ -16,10 +17,7 @@ require (
 	github.com/minio/highwayhash v1.0.4 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
-	github.com/schollz/cli/v2 v2.2.1 // indirect
-	github.com/schollz/croc/v10 v10.4.3 // indirect
 	github.com/schollz/logger v1.2.0 // indirect
 	github.com/schollz/pake/v3 v3.1.1 // indirect
 	github.com/schollz/peerdiscovery v1.7.6 // indirect
