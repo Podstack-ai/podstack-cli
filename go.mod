@@ -3,7 +3,6 @@ module github.com/Podstack-ai/podstack-cli
 go 1.25.0
 
 require (
-	github.com/creack/pty v1.1.21
 	github.com/schollz/croc/v10 v10.4.3
 	github.com/spf13/cobra v1.8.1
 )
@@ -34,4 +33,4 @@ require (
 	golang.org/x/time v0.15.0 // indirect
 )
 
-replace github.com/schollz/croc/v10 => github.com/Podstack-ai/croc/v10 v10.4.3-podstack.1
+replace github.com/schollz/croc/v10 => github.com/Podstack-ai/croc/v10 v10.4.3-podstack.2

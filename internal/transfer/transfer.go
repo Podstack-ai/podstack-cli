@@ -88,33 +88,35 @@ func buildRelayPorts(transfers int) []string {
 
 func buildSendOptions(cfg SendConfig) croc.Options {
 	return croc.Options{
-		IsSender:      true,
-		SharedSecret:  cfg.Code,
-		RelayAddress:  cfg.Relay,
-		RelayAddress6: "", // forced empty: we use a single IPv4 relay
-		RelayPorts:    buildRelayPorts(cfg.Transfers),
-		RelayPassword: models.DEFAULT_PASSPHRASE,
-		Curve:         "p256",
-		HashAlgorithm: "xxhash",
-		SendingText:   cfg.Text != "",
-		NoCompress:    cfg.NoCompress,
-		ZipFolder:     cfg.ZipFolder,
-		Overwrite:     false,
-		NoPrompt:      true, // sender never prompts
+		IsSender:         true,
+		SharedSecret:     cfg.Code,
+		RelayAddress:     cfg.Relay,
+		RelayAddress6:    "", // forced empty: we use a single IPv4 relay
+		RelayPorts:       buildRelayPorts(cfg.Transfers),
+		RelayPassword:    models.DEFAULT_PASSPHRASE,
+		Curve:            "p256",
+		HashAlgorithm:    "xxhash",
+		SendingText:      cfg.Text != "",
+		NoCompress:       cfg.NoCompress,
+		ZipFolder:        cfg.ZipFolder,
+		Overwrite:        false,
+		NoPrompt:         true, // sender never prompts
+		DisableClipboard: true, // we don't want side effects in the user's clipboard
 	}
 }
 
 func buildReceiveOptions(cfg ReceiveConfig) croc.Options {
 	return croc.Options{
-		IsSender:      false,
-		SharedSecret:  cfg.Code,
-		RelayAddress:  cfg.Relay,
-		RelayAddress6: "",
-		RelayPassword: models.DEFAULT_PASSPHRASE,
-		Curve:         "p256",
-		HashAlgorithm: "xxhash",
-		NoPrompt:      cfg.AutoAccept,
-		Overwrite:     true, // required for resume
+		IsSender:         false,
+		SharedSecret:     cfg.Code,
+		RelayAddress:     cfg.Relay,
+		RelayAddress6:    "",
+		RelayPassword:    models.DEFAULT_PASSPHRASE,
+		Curve:            "p256",
+		HashAlgorithm:    "xxhash",
+		NoPrompt:         cfg.AutoAccept,
+		Overwrite:        true, // required for resume
+		DisableClipboard: true,
 	}
 }
 
@@ -123,8 +125,6 @@ func Send(cfg SendConfig) error {
 	if err := cfg.Validate(); err != nil {
 		return err
 	}
-	restore := suppressStderr()
-	defer restore()
 	opts := buildSendOptions(cfg)
 
 	var (
@@ -160,8 +160,6 @@ func Receive(cfg ReceiveConfig) error {
 	if err := cfg.Validate(); err != nil {
 		return err
 	}
-	restore := suppressStderr()
-	defer restore()
 	if cfg.OutDir != "" {
 		if err := os.MkdirAll(cfg.OutDir, 0o755); err != nil {
 			return fmt.Errorf("creating out dir: %w", err)
