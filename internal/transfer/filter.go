@@ -6,6 +6,8 @@ import (
 	"os"
 	"regexp"
 	"sync"
+
+	"github.com/creack/pty"
 )
 
 // suppressPatterns are regexes matched against complete \n-terminated lines
@@ -23,32 +25,47 @@ var suppressPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`Code copied to clipboard`),
 }
 
-// suppressStderr installs a line filter over os.Stderr. While installed,
-// any complete line written to stderr is matched against suppressPatterns
-// and dropped if it matches; otherwise it passes through unchanged.
-// Partial lines (e.g. progress-bar \r updates) flow through immediately.
+// suppressStderr installs a line filter over os.Stderr that drops
+// engine-branded instructional lines while passing everything else
+// (including \r-terminated progress-bar updates) through unchanged.
+//
+// We back the swap with a PTY rather than a pipe so progress libraries that
+// detect interactive terminals via isatty(2) continue to render in real
+// time — a plain os.Pipe is not a TTY and causes those libraries to fall
+// back to non-interactive output (which looks frozen to the user).
+//
+// If PTY allocation fails (e.g., a container without /dev/ptmx), we bail
+// out and leave os.Stderr untouched. Transfers still work; the only loss
+// is the line filter.
 //
 // Returns a restore function the caller must invoke (typically via defer)
-// before returning. Restore closes the pipe, drains the goroutine, and
-// puts os.Stderr back to the original FD.
+// to flush the goroutine and restore os.Stderr.
 func suppressStderr() func() {
 	orig := os.Stderr
-	r, w, err := os.Pipe()
+	ptmx, ttyFile, err := pty.Open()
 	if err != nil {
 		return func() {}
 	}
-	os.Stderr = w
+
+	// Inherit the original terminal size so the progress bar's width math
+	// (and any future tabular output) matches what the user actually sees.
+	if size, err := pty.GetsizeFull(orig); err == nil {
+		_ = pty.Setsize(ptmx, size)
+	}
+
+	os.Stderr = ttyFile
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		filterStream(r, orig)
+		filterStream(ptmx, orig)
 	}()
 
 	return func() {
-		_ = w.Close()
+		_ = ttyFile.Close()
 		wg.Wait()
+		_ = ptmx.Close()
 		os.Stderr = orig
 	}
 }
