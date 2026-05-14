@@ -8,7 +8,7 @@ import (
 func TestBuildSendOptions(t *testing.T) {
 	cfg := SendConfig{
 		Code:       "podstack-foo-bar",
-		Relay:      "relay.cloud.podstack.ai:9009",
+		Relay:      "relay.example.com:9009",
 		Text:       "",
 		ZipFolder:  true,
 		NoCompress: true,
@@ -21,7 +21,7 @@ func TestBuildSendOptions(t *testing.T) {
 	if opts.SharedSecret != "podstack-foo-bar" {
 		t.Errorf("SharedSecret = %q, want %q", opts.SharedSecret, "podstack-foo-bar")
 	}
-	if opts.RelayAddress != "relay.cloud.podstack.ai:9009" {
+	if opts.RelayAddress != "relay.example.com:9009" {
 		t.Errorf("RelayAddress = %q", opts.RelayAddress)
 	}
 	if !opts.ZipFolder {
@@ -52,7 +52,7 @@ func TestBuildSendOptionsTextMode(t *testing.T) {
 func TestBuildReceiveOptions(t *testing.T) {
 	cfg := ReceiveConfig{
 		Code:        "podstack-foo-bar",
-		Relay:       "relay.cloud.podstack.ai:9009",
+		Relay:       "relay.example.com:9009",
 		AutoAccept:  true,
 	}
 	opts := buildReceiveOptions(cfg)
@@ -65,7 +65,7 @@ func TestBuildReceiveOptions(t *testing.T) {
 	if opts.SharedSecret != "podstack-foo-bar" {
 		t.Errorf("SharedSecret = %q", opts.SharedSecret)
 	}
-	if opts.RelayAddress != "relay.cloud.podstack.ai:9009" {
+	if opts.RelayAddress != "relay.example.com:9009" {
 		t.Errorf("RelayAddress = %q", opts.RelayAddress)
 	}
 }

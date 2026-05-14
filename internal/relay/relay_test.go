@@ -12,8 +12,8 @@ func TestResolve(t *testing.T) {
 		wantErr     bool
 	}{
 		{
-			name: "all defaults uses podstack relay",
-			want: "relay.cloud.podstack.ai:9009",
+			name: "all defaults uses built-in default",
+			want: "croc.schollz.com:9009",
 		},
 		{
 			name: "env overrides default",

@@ -1,15 +1,14 @@
 # podstack
 
-`podstack` is a thin CLI for sending and receiving large files between any two
-machines, powered by [croc](https://github.com/schollz/croc). Croc is bundled
-into the binary — no separate install required.
+Official command-line interface for [podstack.ai](https://podstack.ai) — the
+ML cloud platform.
 
-It defaults to the Podstack-operated relay
-(`relay.cloud.podstack.ai:9009`) so transfers don't depend on third-party
-infrastructure, but you can use croc's public relay or any custom relay you
-operate.
+This release ships peer-to-peer file transfer for moving model weights,
+datasets, and other large artifacts between machines. More podstack.ai
+features (model deployment, GPU lease management, run logs, billing) will
+land in future releases.
 
-Supports macOS and Linux (`amd64` and `arm64`).
+Supports macOS and Linux (amd64 and arm64).
 
 ## Install
 
@@ -19,33 +18,43 @@ Supports macOS and Linux (`amd64` and `arm64`).
 curl -fsSL https://github.com/Podstack-ai/podstack-cli/releases/latest/download/install.sh | sh
 ```
 
+The installer detects your OS (`Darwin` / `Linux`) and CPU architecture
+(`amd64` / `arm64`), downloads the matching tarball, verifies its sha256,
+and drops `podstack` into `/usr/local/bin` (or `~/.local/bin` if that's not
+writable).
+
 ### Binary download
 
-Download a release tarball from <https://github.com/Podstack-ai/podstack-cli/releases>
-and place `podstack` on your `PATH`.
+Grab a release tarball from
+<https://github.com/Podstack-ai/podstack-cli/releases> and place `podstack`
+on your `PATH`.
 
 ## Usage
 
 ### Send a file
 
+On the sending machine:
+
 ```sh
-podstack send ./episode-001.wav
-# prints a code phrase for the receiver
+podstack send ./model.bin
+# prints a code phrase
 ```
 
 ### Send a directory or multiple paths
 
 ```sh
-podstack send ./assets/ ./notes.md
+podstack send ./checkpoints/ ./config.yaml
 ```
 
 ### Send a text message
 
 ```sh
-podstack send --text "see you at 3pm"
+podstack send --text "training finished, model.bin coming next"
 ```
 
 ### Receive
+
+On the receiving machine, run the code phrase the sender printed:
 
 ```sh
 podstack receive <code-phrase>
@@ -60,27 +69,11 @@ podstack send --code my-shared-code ./big.zip
 podstack receive my-shared-code
 ```
 
-### Pick a different relay
-
-```sh
-# croc's public relay
-podstack send --relay-default ./big.zip
-
-# custom relay
-podstack send --relay myrelay.example.com:9009 ./big.zip
-
-# via environment
-PODSTACK_RELAY=myrelay.example.com podstack send ./big.zip
-```
-
-Precedence: `--relay` > `--relay-default` > `PODSTACK_RELAY` env > default
-(`relay.cloud.podstack.ai`).
-
 ### Resume
 
-If a transfer is interrupted, re-run the same `podstack receive` command in the
-same output directory. Croc detects the partial file by hash and resumes
-from where it left off.
+If a transfer is interrupted, re-run the same `podstack receive` command in
+the same output directory. The partial file is detected by hash and the
+transfer resumes where it left off.
 
 ## License
 
